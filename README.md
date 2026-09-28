@@ -2,20 +2,43 @@
 
 A Windows desktop application built with Python and PySide6 that provides a single reading interface for multiple content types.
 
+## Supported Formats
+
+- PDF       ✅
+- Word      ✅
+- Excel     ✅
+- TXT       ✅
+- Markdown  ⏳
+- Web       ⏳
+
+## Phase 2 Architecture
+
+```text
+                PySide6 UI
+                     │
+                     ▼
+             DocumentService
+                     │
+                     ▼
+               ReaderFactory
+                     │
+        ┌────────────┼────────────┐
+        ▼            ▼            ▼
+     PDFReader   WordReader   ExcelReader
+        │            │            │
+        └────────────┼────────────┘
+                     ▼
+                 Document
+                     │
+                     ▼
+               ReaderWidget
+```
+
 ## Project Status
 
-**Phase 1 — Foundation**
+**Phase 2 — Core Document Reading Architecture**
 
-Initial project setup. The first goal is to create a clean architecture that can read:
-
-- PDF
-- Microsoft Word (`.docx`)
-- Microsoft Excel (`.xlsx`)
-- Web pages
-- Plain text (`.txt`)
-- Markdown (`.md`)
-
-Future phases may add text-to-speech, OCR, AI document Q&A, RAG, and Windows accessibility integration.
+The project now includes a format-independent document model, reader interface, concrete readers, service layer, and a basic PySide6 viewer.
 
 ## Technology
 
@@ -24,11 +47,9 @@ Future phases may add text-to-speech, OCR, AI document Q&A, RAG, and Windows acc
 - PyMuPDF
 - python-docx
 - openpyxl
-- requests
-- BeautifulSoup4
 - pytest
 
-## Initial Architecture
+## Directory Structure
 
 ```text
 pse-universal-reader/
@@ -37,29 +58,45 @@ pse-universal-reader/
 │   ├── __init__.py
 │   └── main.py
 │
-├── readers/
 ├── models/
+│   ├── __init__.py
+│   └── document.py
+│
+├── readers/
+│   ├── __init__.py
+│   ├── base_reader.py
+│   ├── text_reader.py
+│   ├── pdf_reader.py
+│   ├── word_reader.py
+│   └── excel_reader.py
+│
 ├── services/
+│   ├── __init__.py
+│   ├── exceptions.py
+│   ├── reader_factory.py
+│   └── document_service.py
+│
 ├── ui/
+│   ├── __init__.py
+│   └── reader_widget.py
+│
 ├── utils/
+│   ├── __init__.py
+│   └── logger.py
 │
 ├── tests/
+│   ├── __init__.py
+│   ├── test_text_reader.py
+│   ├── test_pdf_reader.py
+│   ├── test_word_reader.py
+│   ├── test_excel_reader.py
+│   └── test_reader_factory.py
 │
 ├── examples/
-│
 ├── requirements.txt
 ├── README.md
 └── .gitignore
 ```
-
-## First Milestone
-
-The first milestone is intentionally small:
-
-1. Create the Python application entry point.
-2. Launch a PySide6 Windows window.
-3. Display the application name.
-4. Keep the structure ready for document readers.
 
 ## Run
 
@@ -76,31 +113,40 @@ Install dependencies:
 pip install -r requirements.txt
 ```
 
-Run:
+Run the application:
 
 ```bash
 python -m app.main
 ```
 
-## Roadmap
+Run the tests:
 
-### Phase 1
-Multi-format local/web reading foundation.
-
-### Phase 2
-Search, bookmarks, reading history, themes, OCR and text-to-speech.
-
-### Phase 3
-AI summarization, explanation, translation and document Q&A.
-
-### Phase 4
-RAG and multi-document knowledge search.
-
-### Phase 5
-Windows accessibility/UI Automation and "read selected screen content".
+```bash
+pytest
+```
 
 ## Design Principle
 
 The UI should never contain document-format-specific parsing logic.
 
-Each reader should convert its source into a common document representation so that future features such as search, AI and RAG can work independently of the original file type.
+Each reader converts its source into a common `Document` representation so future features such as search and AI can work independently of the original file type.
+
+## Roadmap
+
+### Phase 1
+Foundational app shell.
+
+### Phase 2
+Document model, readers, service layer, and reader UI.
+
+### Phase 3
+Search, bookmarks, reading history, themes, OCR and text-to-speech.
+
+### Phase 4
+AI summarization, explanation, translation, and document Q&A.
+
+### Phase 5
+RAG and multi-document knowledge search.
+
+### Phase 6
+Windows accessibility/UI Automation and "read selected screen content".
